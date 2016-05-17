@@ -50,6 +50,14 @@ $application->add(new \OC\Core\Command\Integrity\CheckApp(
 $application->add(new \OC\Core\Command\Integrity\CheckCore(
 		\OC::$server->getIntegrityCodeChecker()
 ));
+$application->add(new OC\Core\Command\TwoFactorAuth\Enable(
+		\OC::$server->getTwoFactorAuthManager(),
+		\OC::$server->getUserManager()
+));
+$application->add(new OC\Core\Command\TwoFactorAuth\Disable(
+		\OC::$server->getTwoFactorAuthManager(),
+		\OC::$server->getUserManager()
+));
 
 
 if (\OC::$server->getConfig()->getSystemValue('installed', false)) {
