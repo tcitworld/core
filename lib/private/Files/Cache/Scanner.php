@@ -386,6 +386,9 @@ class Scanner extends BasicEmitter implements IScanner {
 				if ($data) {
 					if ($data['mimetype'] === 'httpd/unix-directory' and $recursive === self::SCAN_RECURSIVE) {
 						$childQueue[$child] = $data;
+					} else if ($data['mimetype'] === 'httpd/unix-directory' and $recursive === self::SCAN_RECURSIVE_INCOMPLETE and $data['size'] === -1) {
+						// only recurse into folders which aren't fully scanned
+						$childQueue[$child] = $data;
 					} else if ($data['size'] === -1) {
 						$size = -1;
 					} else if ($size !== -1) {
@@ -422,7 +425,7 @@ class Scanner extends BasicEmitter implements IScanner {
 		}
 
 		foreach ($childQueue as $child => $childData) {
-			$childSize = $this->scanChildren($child, self::SCAN_RECURSIVE, $reuse, $childData, $lock);
+			$childSize = $this->scanChildren($child, $recursive, $reuse, $childData, $lock);
 			if ($childSize === -1) {
 				$size = -1;
 			} else if ($size !== -1) {
@@ -467,7 +470,7 @@ class Scanner extends BasicEmitter implements IScanner {
 			$lastPath = null;
 			while (($path = $this->cache->getIncomplete()) !== false && $path !== $lastPath) {
 				$this->runBackgroundScanJob(function() use ($path) {
-					$this->scan($path, self::SCAN_RECURSIVE, self::REUSE_ETAG);
+					$this->scan($path, self::SCAN_RECURSIVE_INCOMPLETE, self::REUSE_ETAG | self::REUSE_SIZE);
 				}, $path);
 				// FIXME: this won't proceed with the next item, needs revamping of getIncomplete()
 				// to make this possible
