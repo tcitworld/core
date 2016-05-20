@@ -184,6 +184,9 @@ class LoginController extends Controller {
 			$args = !is_null($user) ? ['user' => $user] : [];
 			return new RedirectResponse($this->urlGenerator->linkToRoute('core.login.showLoginForm', $args));
 		}
+		// TODO: remove password checks from above and let the user session handle failures
+		// requires https://github.com/owncloud/core/pull/24616
+		$this->userSession->login($user, $password);
 		$this->userSession->createSessionToken($this->request, $loginResult->getUID(), $password);
 		if (!is_null($redirect_url) && $this->userSession->isLoggedIn()) {
 			$location = $this->urlGenerator->getAbsoluteURL(urldecode($redirect_url));
