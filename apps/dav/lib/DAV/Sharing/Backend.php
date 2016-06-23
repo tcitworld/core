@@ -204,4 +204,18 @@ class Backend {
 		}
 		return $acl;
 	}
+
+	/**
+	 * @param mixed $calendarId
+	 * @param bool $value
+	 * @return void
+	 */
+	function setPublishStatus($calendarId, $value) {
+		$query = $this->db->getQueryBuilder();
+		$query->update('calendars')
+					->set('public', '?')
+					->setParameter($value);
+		$query->execute();
+		return $query->getLastInsertId();
+	}
 }

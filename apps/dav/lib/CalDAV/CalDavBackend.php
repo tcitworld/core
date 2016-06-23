@@ -32,6 +32,7 @@ use Sabre\CalDAV\Backend\AbstractBackend;
 use Sabre\CalDAV\Backend\SchedulingSupport;
 use Sabre\CalDAV\Backend\SubscriptionSupport;
 use Sabre\CalDAV\Backend\SyncSupport;
+use Sabre\CalDAV\Backend\SharingSupport;
 use Sabre\CalDAV\Plugin;
 use Sabre\CalDAV\Xml\Property\ScheduleCalendarTransp;
 use Sabre\CalDAV\Xml\Property\SupportedCalendarComponentSet;
@@ -50,7 +51,7 @@ use Sabre\VObject\Recur\EventIterator;
  *
  * @package OCA\DAV\CalDAV
  */
-class CalDavBackend extends AbstractBackend implements SyncSupport, SubscriptionSupport, SchedulingSupport {
+class CalDavBackend extends AbstractBackend implements SyncSupport, SubscriptionSupport, SchedulingSupport, SharingSupport {
 
 	/**
 	 * We need to specify a max date, because we need to stop *somewhere*
@@ -1397,7 +1398,7 @@ class CalDavBackend extends AbstractBackend implements SyncSupport, Subscription
 	 * @param array $add
 	 * @param array $remove
 	 */
-	public function updateShares($shareable, $add, $remove) {
+	public function updateShares($shareable, array $add, array $remove) {
 		$this->sharingBackend->updateShares($shareable, $add, $remove);
 	}
 
@@ -1407,6 +1408,47 @@ class CalDavBackend extends AbstractBackend implements SyncSupport, Subscription
 	 */
 	public function getShares($resourceId) {
 		return $this->sharingBackend->getShares($resourceId);
+	}
+
+	/**
+	 * @param string href The sharee who is replying (often a mailto: address)
+	 * @param int status One of the SharingPlugin::STATUS_* constants
+	 * @param string $calendarUri The url to the calendar thats being shared
+	 * @param string $inReplyTo The unique id this message is a response to
+	 * @param string $summary A description of the reply
+	 * @return null|string
+	 */
+	function shareReply($href, $status, $calendarUri, $inReplyTo, $summary = null) {
+		return $this->sharingBackend->shareReply($href, $status, $calendarUri, $inReplyTo, $summary);
+	}
+
+	/**
+	 * @param mixed $calendarId
+	 * @param bool $value
+	 * @return void
+	 */
+	function setPublishStatus($calendarId, $value) {
+		$this->sharingBackend->setPublishStatus($calendarId, $value);
+	}
+
+	/**
+	 * Returns a list of notifications for a given principal url.
+	 *
+	 * @param string $principalUri
+	 * @return NotificationInterface[]
+	 */
+	function getNotificationsForPrincipal($principalUri) {
+		throw new Exception("Not implemented yet");
+	}
+
+	/**
+	 * @param string $principalUri
+	 * @param NotificationInterface $notification
+	 * @return void
+	 */
+	function deleteNotification($principalUri, \Sabre\CalDAV\Xml\Notification\NotificationInterface $notification) {
+		throw new Exception("Not implemented yet");
+
 	}
 
 	/**
