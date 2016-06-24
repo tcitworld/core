@@ -216,6 +216,5 @@ class Backend {
 					->set('public', '?')
 					->setParameter($value);
 		$query->execute();
-		return $query->getLastInsertId();
 	}
 }
