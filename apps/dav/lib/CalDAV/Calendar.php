@@ -247,4 +247,14 @@ class Calendar extends \Sabre\CalDAV\Calendar implements IShareable, IShareableC
 		return isset($this->calendarInfo['{http://owncloud.org/ns}owner-principal']);
 	}
 
+	/**
+	 * @param bool $value
+	 * @return void
+	 */
+	function setPublishStatus($value) {
+		/** @var CalDavBackend $calDavBackend */
+		$calDavBackend = $this->caldavBackend;
+		$calDavBackend->setPublishStatus($this, $value);
+	}
+
 }

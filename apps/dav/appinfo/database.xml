@@ -358,10 +358,9 @@ CREATE TABLE calendarobjects (
 			<type>text</type>
 		</field>
 		<field>
-			<name>public</name>
-			<type>integer</type>
-			<default>0</default>
-			<length>1</length>
+			<name>publish-url</name>
+			<type>text</type>
+			<length>255</length>
 		</field>
 		<field>
 			<name>timezone</name>

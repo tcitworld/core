@@ -206,15 +206,17 @@ class Backend {
 	}
 
 	/**
-	 * @param mixed $calendarId
+	 * @param OCA\DAV\CalDAV\Calendar $sharable
 	 * @param bool $value
 	 * @return void
 	 */
-	function setPublishStatus($calendarId, $value) {
-		$query = $this->db->getQueryBuilder();
-		$query->update('calendars')
-					->set('public', '?')
-					->setParameter($value);
-		$query->execute();
+	function setPublishStatus($sharable, $value) {
+		if ($value) {
+			$query = $this->db->getQueryBuilder();
+			$query->update('calendars')
+						->set('publish-url', $query->createNamedParameter('public/' . $sharable->getResourceId()))
+						->where($query->expr()->eq('id', $sharable->getResourceId()));
+			$query->execute();
+		}
 	}
 }

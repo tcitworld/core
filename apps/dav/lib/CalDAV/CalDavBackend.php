@@ -1423,12 +1423,12 @@ class CalDavBackend extends AbstractBackend implements SyncSupport, Subscription
 	}
 
 	/**
-	 * @param mixed $calendarId
+	 * @param OCA\DAV\CalDAV\Calendar $sharable
 	 * @param bool $value
 	 * @return void
 	 */
-	function setPublishStatus($calendarId, $value) {
-		$this->sharingBackend->setPublishStatus($calendarId, $value);
+	function setPublishStatus($sharable, $value) {
+		$this->sharingBackend->setPublishStatus($sharable, $value);
 	}
 
 	/**

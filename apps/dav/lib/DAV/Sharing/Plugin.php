@@ -173,10 +173,10 @@ class Plugin extends ServerPlugin {
 				// Breaking the event chain
 				return false;
 
-		case '{' . Plugin::NS_CALENDARSERVER . '}publish-calendar' :
+		case '{' . self::NS_OWNCLOUD . '}publish-calendar' :
 
 				// We can only deal with IShareableCalendar objects
-				if (!$node instanceof IShareableCalendar) {
+				if (!$node instanceof IShareable) {
 						return;
 				}
 				$this->server->transactionType = 'post-publish-calendar';
@@ -201,10 +201,10 @@ class Plugin extends ServerPlugin {
 				// Breaking the event chain
 				return false;
 
-		case '{' . Plugin::NS_CALENDARSERVER . '}unpublish-calendar' :
+		case '{' . self::NS_OWNCLOUD . '}unpublish-calendar' :
 
 				// We can only deal with IShareableCalendar objects
-				if (!$node instanceof IShareableCalendar) {
+				if (!$node instanceof IShareable) {
 						return;
 				}
 				$this->server->transactionType = 'post-unpublish-calendar';
