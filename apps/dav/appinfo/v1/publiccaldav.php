@@ -1,13 +1,6 @@
 <?php
 /**
- * @author Björn Schießle <bjoern@schiessle.org>
- * @author Joas Schilling <nickvergessen@owncloud.com>
- * @author Lukas Reschke <lukas@statuscode.ch>
- * @author Morris Jobke <hey@morrisjobke.de>
- * @author Robin Appelman <icewind@owncloud.com>
- * @author Roeland Jago Douma <rullzer@owncloud.com>
- * @author Thomas Müller <thomas.mueller@tmit.eu>
- * @author Vincent Petry <pvince81@owncloud.com>
+ * @author Thomas Citharel <tcit@tcit.fr>
  *
  * @copyright Copyright (c) 2016, ownCloud, Inc.
  * @license AGPL-3.0
@@ -53,31 +46,40 @@ $requestUri = \OC::$server->getRequest()->getRequestUri();
 
 $linkCheckPlugin = new \OCA\DAV\CalDAV\Sharing\PublicLinkCheckPlugin();
 
-$server = $serverFactory->createServer($baseuri, $requestUri, $authBackend, function (\Sabre\DAV\Server $server) use ($authBackend, $linkCheckPlugin) {
-	// $isAjax = (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest');
-	// $federatedSharingApp = new \OCA\FederatedFileSharing\AppInfo\Application('federatedfilesharing');
-	// $federatedShareProvider = $federatedSharingApp->getFederatedShareProvider();
-	// if ($federatedShareProvider->isOutgoingServer2serverShareEnabled() === false && !$isAjax) {
-	// 	// this is what is thrown when trying to access a non-existing share
-	// 	throw new \Sabre\DAV\Exception\NotAuthenticated();
-	// }
+$db = \OC::$server->getDatabaseConnection();
+$cardDavBackend = new CardDavBackend($db, $principalBackend);
 
-	$share = $authBackend->getShare();
-	$owner = $share->getShareOwner();
-	$fileId = $share->getNodeId();
+$debugging = \OC::$server->getConfig()->getSystemValue('debug', false);
 
-	\OC\Files\Filesystem::addStorageWrapper('sharePermissions', function ($mountPoint, $storage) use ($share) {
-		return new \OC\Files\Storage\Wrapper\PermissionsMask(array('storage' => $storage, 'mask' => $share->getPermissions() | \OCP\Constants::PERMISSION_SHARE));
-	});
+// Root nodes
+$principalCollection = new \Sabre\CalDAV\Principal\Collection($principalBackend);
+$principalCollection->disableListing = !$debugging; // Disable listing
 
-	OC_Util::setupFS($owner);
-	$ownerView = \OC\Files\Filesystem::getView();
-	$path = $ownerView->getPath($fileId);
-	$fileInfo = $ownerView->getFileInfo($path);
-	$linkCheckPlugin->setFileInfo($fileInfo);
+$addressBookRoot = new AddressBookRoot($principalBackend, $cardDavBackend);
+$addressBookRoot->disableListing = !$debugging; // Disable listing
 
-	return new \OC\Files\View($ownerView->getAbsolutePath($path));
-});
+$nodes = array(
+	$principalCollection,
+	$addressBookRoot,
+);
+
+// Fire up server
+$server = new \Sabre\DAV\Server($nodes);
+$server->httpRequest->setUrl(\OC::$server->getRequest()->getRequestUri());
+$server->setBaseUri($baseuri);
+// Add plugins
+$server->addPlugin(new MaintenancePlugin());
+$server->addPlugin(new \Sabre\DAV\Auth\Plugin($authBackend, 'ownCloud'));
+$server->addPlugin(new Plugin());
+
+$server->addPlugin(new LegacyDAVACL());
+if ($debugging) {
+	$server->addPlugin(new Sabre\DAV\Browser\Plugin());
+}
+
+$server->addPlugin(new \Sabre\CardDAV\VCFExportPlugin());
+$server->addPlugin(new \OCA\DAV\CardDAV\ImageExportPlugin(\OC::$server->getLogger()));
+$server->addPlugin(new ExceptionLoggerPlugin('carddav', \OC::$server->getLogger()))
 
 $server->addPlugin($linkCheckPlugin);
 
