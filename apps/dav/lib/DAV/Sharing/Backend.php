@@ -211,12 +211,16 @@ class Backend {
 	 * @return void
 	 */
 	function setPublishStatus($sharable, $value) {
+		$query = $this->db->getQueryBuilder();
 		if ($value) {
-			$query = $this->db->getQueryBuilder();
 			$query->update('calendars')
 						->set('publish-url', $query->createNamedParameter('public/' . $sharable->getResourceId()))
 						->where($query->expr()->eq('id', $sharable->getResourceId()));
-			$query->execute();
+		} else {
+			$query->update('calendars')
+						->set('publish-url', '')
+						->where($query->expr()->eq('id', $sharable->getResourceId()));
 		}
+		$query->execute();
 	}
 }
