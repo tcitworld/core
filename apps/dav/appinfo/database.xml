@@ -300,7 +300,6 @@ CREATE TABLE calendarobjects (
 		description TEXT,
 		calendarorder INT(11) UNSIGNED NOT NULL DEFAULT '0',
 		calendarcolor VARBINARY(10),
-		public TINYINT(1) NOT NULL DEFAULT '0',
 		timezone CLOB,
 		components VARBINARY(20),
 		transparent TINYINT(1) NOT NULL DEFAULT '0',
@@ -356,11 +355,6 @@ CREATE TABLE calendarobjects (
 		<field>
 			<name>calendarcolor</name>
 			<type>text</type>
-		</field>
-		<field>
-			<name>publish-url</name>
-			<type>text</type>
-			<length>255</length>
 		</field>
 		<field>
 			<name>timezone</name>

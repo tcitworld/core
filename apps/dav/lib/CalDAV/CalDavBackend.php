@@ -1419,7 +1419,7 @@ class CalDavBackend extends AbstractBackend implements SyncSupport, Subscription
 	 * @return null|string
 	 */
 	function shareReply($href, $status, $calendarUri, $inReplyTo, $summary = null) {
-		return $this->sharingBackend->shareReply($href, $status, $calendarUri, $inReplyTo, $summary);
+		throw new Exception("Not implemented yet");
 	}
 
 	/**

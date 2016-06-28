@@ -213,13 +213,17 @@ class Backend {
 	function setPublishStatus($sharable, $value) {
 		$query = $this->db->getQueryBuilder();
 		if ($value) {
-			$query->update('calendars')
-						->set('publish-url', $query->createNamedParameter('public/' . $sharable->getResourceId()))
-						->where($query->expr()->eq('id', $sharable->getResourceId()));
+			$query->insert('dav_shares')
+						->values([
+							'principaluri' => $query->createNamedParameter($sharable->getResourceId()),
+							'type' => $query->createNamedParameter($this->resourceType),
+							'access' => $query->createNamedParameter(0),
+							'resourceid' => $query->createNamedParameter($shareable->getResourceId())
+						]);
 		} else {
-			$query->update('calendars')
-						->set('publish-url', '')
-						->where($query->expr()->eq('id', $sharable->getResourceId()));
+			$query->delete('dav_shares')
+						->where($query->expr()->eq('principaluri', $sharable->getResourceId()))
+						->andWhere($query->expr()->eq('resourceid', $sharable->getResourceId()));
 		}
 		$query->execute();
 	}
