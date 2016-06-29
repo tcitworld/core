@@ -38,6 +38,7 @@ class Backend {
 	const ACCESS_OWNER = 1;
 	const ACCESS_READ_WRITE = 2;
 	const ACCESS_READ = 3;
+	const ACCESS_PUBLIC = 4;
 
 	/**
 	 * @param IDBConnection $db
@@ -215,10 +216,10 @@ class Backend {
 		if ($value) {
 			$query->insert('dav_shares')
 						->values([
-							'principaluri' => $query->createNamedParameter($sharable->getResourceId()),
+							'principaluri' => $query->createNamedParameter("PUBLIC"),
 							'type' => $query->createNamedParameter($this->resourceType),
-							'access' => $query->createNamedParameter(0),
-							'resourceid' => $query->createNamedParameter($shareable->getResourceId())
+							'access' => $query->createNamedParameter(self::ACCESS_PUBLIC),
+							'resourceid' => $query->createNamedParameter($sharable->getResourceId())
 						]);
 		} else {
 			$query->delete('dav_shares')
