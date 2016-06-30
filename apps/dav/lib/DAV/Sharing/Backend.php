@@ -213,17 +213,19 @@ class Backend {
 	 */
 	function setPublishStatus($sharable, $value) {
 		$query = $this->db->getQueryBuilder();
+		print_r("coucou");
+		print_r($sharable->getResourceId());
 		if ($value) {
 			$query->insert('dav_shares')
 						->values([
-							'principaluri' => $query->createNamedParameter("PUBLIC"),
+							'principaluri' => $query->createNamedParameter('PUBLIC'),
 							'type' => $query->createNamedParameter($this->resourceType),
 							'access' => $query->createNamedParameter(self::ACCESS_PUBLIC),
 							'resourceid' => $query->createNamedParameter($sharable->getResourceId())
 						]);
 		} else {
 			$query->delete('dav_shares')
-						->where($query->expr()->eq('principaluri', $sharable->getResourceId()))
+						->where($query->expr()->eq('principaluri', 'PUBLIC'))
 						->andWhere($query->expr()->eq('resourceid', $sharable->getResourceId()));
 		}
 		$query->execute();
