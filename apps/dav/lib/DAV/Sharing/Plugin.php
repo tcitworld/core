@@ -197,6 +197,7 @@ class Plugin extends ServerPlugin {
 				// Adding this because sending a response body may cause issues,
 				// and I wanted some type of indicator the response was handled.
 				$response->setHeader('X-Sabre-Status', 'everything-went-well');
+				$response->setBody(json_encode(array('token' => 'fndsogf')));
 
 				// Breaking the event chain
 				return false;

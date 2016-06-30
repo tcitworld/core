@@ -213,8 +213,6 @@ class Backend {
 	 */
 	function setPublishStatus($sharable, $value) {
 		$query = $this->db->getQueryBuilder();
-		print_r("coucou");
-		print_r($sharable->getResourceId());
 		if ($value) {
 			$query->insert('dav_shares')
 						->values([
